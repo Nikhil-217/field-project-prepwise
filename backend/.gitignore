@@ -1,0 +1,9 @@
+# WHY THIS FILE EXISTS:
+# .gitignore tells Git which files/folders to NEVER commit.
+# node_modules is huge (100k+ files) — always install fresh with npm install.
+# .env has secrets — never expose to GitHub.
+# uploads/ has user files — belong on the server, not source control.
+
+node_modules/
+.env
+uploads/
