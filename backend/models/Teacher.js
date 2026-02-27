@@ -6,6 +6,15 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
+// Allowed subjects for R22 regulation (STRICT - ONLY THESE SUBJECTS)
+const ALLOWED_SUBJECTS = [
+    "Software Engineering",
+    "Operating System",
+    "Design and Analysis of Algorithm",
+    "Computer Organisation",
+    "Economics and Engineering Accountancy"
+];
+
 const teacherSchema = new mongoose.Schema(
     {
         // ── IDENTITY FIELDS ────────────────────────────────────────────────────────
@@ -22,10 +31,16 @@ const teacherSchema = new mongoose.Schema(
             trim: true,
         },
         subjectDealing: {
-            // The subject this teacher teaches — relevant to link their notes/materials
+            // The subject this teacher teaches — must be from ALLOWED_SUBJECTS
             type: String,
             required: [true, "Subject is required"],
             trim: true,
+            validate: {
+                validator: function (v) {
+                    return ALLOWED_SUBJECTS.includes(v);
+                },
+                message: `Subject must be one of: ${ALLOWED_SUBJECTS.join(", ")}`,
+            },
         },
         section: {
             // The section this teacher is assigned to (A, B, C, D)

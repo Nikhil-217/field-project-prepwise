@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 
 const TeacherDashboard = () => {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [stats, setStats] = useState({
         totalNotes: 0,
@@ -70,6 +70,22 @@ const TeacherDashboard = () => {
                     <div style={styles.actionText}>
                         <p style={styles.actionName}>Upload Notes</p>
                         <p style={styles.actionDesc}>Upload PDF study materials</p>
+                    </div>
+                    <span style={styles.actionArrow}>→</span>
+                </div>
+                <div style={styles.actionCard} onClick={() => navigate("/quizzes/create")}>
+                    <div style={styles.actionIcon}>📝</div>
+                    <div style={styles.actionText}>
+                        <p style={styles.actionName}>Create Quiz</p>
+                        <p style={styles.actionDesc}>Create a new assessment</p>
+                    </div>
+                    <span style={styles.actionArrow}>→</span>
+                </div>
+                <div style={styles.actionCard} onClick={() => navigate("/quizzes")}>
+                    <div style={styles.actionIcon}>📊</div>
+                    <div style={styles.actionText}>
+                        <p style={styles.actionName}>Manage Quizzes</p>
+                        <p style={styles.actionDesc}>View results and quizzes</p>
                     </div>
                     <span style={styles.actionArrow}>→</span>
                 </div>

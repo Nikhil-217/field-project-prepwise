@@ -66,7 +66,6 @@ const Notes = () => {
         <div style={styles.page}>
             <header style={styles.header}>
                 <h1>Notes Management</h1>
-                <p>Viewing notes for: <strong>{user.regulation} | Year {user.year} | Sem {user.semester}</strong></p>
             </header>
 
             <div style={styles.mainLayout}>
@@ -85,6 +84,7 @@ const Notes = () => {
                                 <option value="">All Subjects</option>
                                 <option value="OOPS">OOPS</option>
                                 <option value="SMDA">SMDA</option>
+                                <option value="Software Engineering">Software Engineering</option>
                                 <option value="DLD">DLD</option>
                                 <option value="DBMS">DBMS</option>
                                 <option value="MFCS">MFCS</option>

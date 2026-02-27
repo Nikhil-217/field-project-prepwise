@@ -17,7 +17,11 @@ import StudentDashboard from "./pages/StudentDashboard";
 import TeacherUpload from "./pages/TeacherUpload";
 import StudentNotes from "./pages/StudentNotes";
 import Quizzes from "./pages/Quizzes";
+import QuizCreator from "./pages/QuizCreator";
+import QuizAttempt from "./pages/QuizAttempt";
+import QuizResults from "./pages/QuizResults";
 import StudentList from "./pages/StudentList";
+import StudentPerformance from "./pages/StudentPerformance";
 
 
 function App() {
@@ -39,7 +43,12 @@ function App() {
                 <Route path="/student-dashboard" element={<StudentDashboard />} />
                 <Route path="/student-notes" element={<StudentNotes />} />
                 <Route path="/quizzes" element={<Quizzes />} />
+                <Route path="/quizzes/create" element={<QuizCreator />} />
+                <Route path="/quizzes/:id" element={<QuizResults />} />
+                <Route path="/quizzes/:id/attempt" element={<QuizAttempt />} />
                 <Route path="/students" element={<StudentList />} />
+                <Route path="/students/performance" element={<StudentPerformance />} />
+                <Route path="/students/:id" element={<StudentPerformance />} />
               </Route>
             </Route>
 

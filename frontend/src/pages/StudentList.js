@@ -46,6 +46,9 @@ const StudentList = () => {
                                 <th style={styles.th}>Roll Number</th>
                                 <th style={styles.th}>Email</th>
                                 <th style={styles.th}>Section</th>
+                                <th style={styles.th}>Quizzes Taken</th>
+                                <th style={styles.th}>Total Score</th>
+                                <th style={styles.th}>Average</th>
                                 <th style={styles.th}>Status</th>
                             </tr>
                         </thead>
@@ -64,6 +67,13 @@ const StudentList = () => {
                                         <td style={styles.td}>
                                             <span style={styles.roleTag}>{student.section}</span>
                                         </td>
+                                        <td style={styles.td}>{student.performance?.quizzesAttempted || 0}</td>
+                                        <td style={styles.td}>{student.performance?.totalScore || 0} / {student.performance?.maxScore || 0}</td>
+                                        <td style={styles.td}>
+                                            <span style={{ color: student.performance?.averagePercentage === "N/A" ? "#95a5a6" : parseFloat(student.performance.averagePercentage) >= 50 ? "#27ae60" : "#c0392b", fontWeight: "bold" }}>
+                                                {student.performance?.averagePercentage || "N/A"}
+                                            </span>
+                                        </td>
                                         <td style={styles.td}>
                                             <span style={styles.statusDot}></span> Active
                                         </td>
@@ -71,7 +81,7 @@ const StudentList = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" style={styles.noData}>No students found in your section.</td>
+                                    <td colSpan="8" style={styles.noData}>No students found in your section.</td>
                                 </tr>
                             )}
                         </tbody>

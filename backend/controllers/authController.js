@@ -25,13 +25,20 @@ const generateToken = (id, role) => {
 // Only teacher-specific fields accepted here — no chance of mixing up roles.
 const registerTeacher = async (req, res) => {
     try {
-        const { employeeId, employeeName, subjectDealing, section, email, password } = req.body;
+        const { employeeId, employeeName, subjectDealing, section, email, password, confirmPassword } = req.body;
 
         // ── Validation ──────────────────────────────────────────────────────────
-        if (!employeeId || !employeeName || !subjectDealing || !section || !email || !password) {
+        if (!employeeId || !employeeName || !subjectDealing || !section || !email || !password || !confirmPassword) {
             return res.status(400).json({
                 success: false,
-                message: "All fields are required: employeeId, employeeName, subjectDealing, section, email, password",
+                message: "All fields are required including confirmPassword",
+            });
+        }
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Passwords do not match",
             });
         }
 
@@ -101,13 +108,20 @@ const registerTeacher = async (req, res) => {
 // POST /api/auth/register/student
 const registerStudent = async (req, res) => {
     try {
-        const { name, rollNo, section, year, semester, regulation, email, password } = req.body;
+        const { name, rollNo, section, year, semester, regulation, email, password, confirmPassword } = req.body;
 
         // ── Validation ──────────────────────────────────────────────────────────
-        if (!name || !rollNo || !section || !year || !email || !password) {
+        if (!name || !rollNo || !section || !year || !email || !password || !confirmPassword) {
             return res.status(400).json({
                 success: false,
-                message: "All fields are required: name, rollNo, section, year, email, password",
+                message: "All fields are required including confirmPassword",
+            });
+        }
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Passwords do not match",
             });
         }
 
@@ -246,13 +260,41 @@ const getMyStudents = async (req, res) => {
         // Find students in the SAME section as the teacher
         const students = await Student.find({ section: teacher.section })
             .select("-password") // Never return passwords
-            .sort({ rollNo: 1 });
+            .sort({ rollNo: 1 })
+            .lean(); // Use lean to add virtual fields
+
+        // Fetch Quiz Scores
+        const Quiz = require("../models/Quiz");
+        const Submission = require("../models/Submission");
+
+        const teacherQuizzes = await Quiz.find({ createdBy: teacher._id }).select("_id");
+        const quizIds = teacherQuizzes.map(q => q._id);
+
+        const submissions = await Submission.find({ quiz: { $in: quizIds } });
+
+        // Map submissions to students
+        const studentsWithPerformance = students.map(student => {
+            const studentSubs = submissions.filter(sub => String(sub.student) === String(student._id));
+            const totalQuizzesAttempted = studentSubs.length;
+            const totalScoreEarned = studentSubs.reduce((sum, sub) => sum + sub.totalScore, 0);
+            const totalMaxScore = studentSubs.reduce((sum, sub) => sum + sub.maxScore, 0);
+
+            return {
+                ...student,
+                performance: {
+                    quizzesAttempted: totalQuizzesAttempted,
+                    totalScore: totalScoreEarned,
+                    maxScore: totalMaxScore,
+                    averagePercentage: totalMaxScore > 0 ? ((totalScoreEarned / totalMaxScore) * 100).toFixed(1) + "%" : "N/A",
+                }
+            };
+        });
 
         res.status(200).json({
             success: true,
-            count: students.length,
+            count: studentsWithPerformance.length,
             section: teacher.section,
-            students,
+            students: studentsWithPerformance,
         });
     } catch (error) {
         console.error("getMyStudents error:", error);

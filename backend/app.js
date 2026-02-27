@@ -48,11 +48,11 @@ app.get("/", (req, res) => {
 
 // ─── ROUTES ───────────────────────────────────────────────────────────────────
 // Mount route files at their base paths.
-// Any route defined inside authRoutes is prefixed with /api/auth
-// Any route defined inside noteRoutes is prefixed with /api/notes
+const quizRoutes = require("./routes/quizRoutes");
 
 app.use("/api/auth", authRoutes);   // POST /api/auth/register, POST /api/auth/login
 app.use("/api/notes", noteRoutes);  // GET /api/notes, POST /api/notes, etc.
+app.use("/api/quizzes", quizRoutes); // GET /api/quizzes, POST /api/quizzes, etc.
 
 // ─── ERROR HANDLERS ───────────────────────────────────────────────────────────
 // These must be LAST — Express only passes control here if no route matched,

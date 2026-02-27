@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
-    const { user, logout, isAuthenticated } = useAuth();
+    const { user, logout, isAuthenticated } = useAuth()
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -26,6 +26,13 @@ const Navbar = () => {
                             Hello, <strong>{user?.name || user?.employeeName}</strong> ({user?.role})
                         </span>
                         <Link to="/notes" style={styles.link}>My Notes</Link>
+                        <Link to="/quizzes" style={styles.link}>Quizzes</Link>
+                        {user?.role === "teacher" && (
+                            <>
+                                <Link to="/quizzes/create" style={styles.createBtn}>+ Create Quiz</Link>
+                                <Link to="/students/performance" style={styles.link}>Student Performance</Link>
+                            </>
+                        )}
                         <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
                     </>
                 ) : (
@@ -44,6 +51,7 @@ const styles = {
     logo: { margin: 0, fontSize: "20px" },
     links: { display: "flex", gap: "20px", alignItems: "center" },
     link: { color: "#fff", textDecoration: "none" },
+    createBtn: { padding: "6px 15px", backgroundColor: "#27ae60", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer", textDecoration: "none" },
     user: { fontSize: "14px", color: "#ccc" },
     logoutBtn: { padding: "6px 15px", backgroundColor: "#dc3545", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }
 };

@@ -1,11 +1,30 @@
 // ─── src/pages/StudentDashboard.js ─────────────────────────────────────────────
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { fetchNotes } from "../api/noteService";
 
 const StudentDashboard = () => {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [notesCount, setNotesCount] = useState(0);
+
+    useEffect(() => {
+        const loadNotesCount = async () => {
+            try {
+                // Fetch notes with student's current year/sem constraints
+                const data = await fetchNotes({
+                    year: 2,
+                    semester: 1
+                });
+                setNotesCount(data.notes.length);
+            } catch (err) {
+                console.error("Failed to fetch notes count:", err);
+            }
+        };
+
+        loadNotesCount();
+    }, []);
 
     return (
         <div style={styles.dashboardContainer}>
@@ -23,7 +42,7 @@ const StudentDashboard = () => {
                 <div style={styles.statCard}>
                     <div style={styles.statIconContainer}>📄</div>
                     <div style={styles.statContent}>
-                        <h2 style={styles.statNumber}>1</h2>
+                        <h2 style={styles.statNumber}>{notesCount}</h2>
                         <p style={styles.statLabel}>Available Notes</p>
                     </div>
                 </div>
@@ -39,6 +58,14 @@ const StudentDashboard = () => {
                     <div style={styles.actionText}>
                         <p style={styles.actionName}>Browse Notes</p>
                         <p style={styles.actionDesc}>Access study materials</p>
+                    </div>
+                    <span style={styles.actionArrow}>→</span>
+                </div>
+                <div style={styles.actionCard} onClick={() => navigate("/quizzes")}>
+                    <div style={styles.actionIcon}>📝</div>
+                    <div style={styles.actionText}>
+                        <p style={styles.actionName}>Take Quizzes</p>
+                        <p style={styles.actionDesc}>Attempt specific quizzes</p>
                     </div>
                     <span style={styles.actionArrow}>→</span>
                 </div>

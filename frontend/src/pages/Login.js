@@ -6,16 +6,15 @@
 
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import api from "../api/axios";
 
 const Login = () => {
     // 1. STATE MANAGEMENT
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-        role: "student", // Default role
-    });
+    const [role, setRole] = useState("student"); // Which tab is active: student or teacher
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -24,7 +23,10 @@ const Login = () => {
 
     // 2. FORM HANDLERS
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        if (name === "email") setEmail(value);
+        else if (name === "password") setPassword(value);
+        else if (name === "role") setRole(value);
     };
 
     const handleSubmit = async (e) => {
@@ -34,23 +36,17 @@ const Login = () => {
 
         try {
             // POST the credentials to our backend
-            // Our api (from axios.js) will use the correct baseURL
-            const response = await api.post("/auth/login", formData);
-
-            // Axios successful responses return data in response.data
+            const response = await api.post("/auth/login", { email, password, role });
             const { user, token } = response.data;
 
-            // Update global context & save to localStorage
             login(user, token);
 
-            // 5. REDIRECT BASED ON ROLE
             if (user.role === "teacher") {
                 navigate("/teacher-dashboard");
             } else {
                 navigate("/student-dashboard");
             }
         } catch (err) {
-            // Error handling (our interceptor returns just the message string)
             setError(err || "Login failed. Please check your credentials.");
         } finally {
             setLoading(false);
@@ -67,7 +63,7 @@ const Login = () => {
 
                 <div style={styles.inputGroup}>
                     <label>I am a:</label>
-                    <select name="role" value={formData.role} onChange={handleChange} style={styles.input}>
+                    <select name="role" value={role} onChange={handleChange} style={styles.input}>
                         <option value="student">Student</option>
                         <option value="teacher">Teacher</option>
                     </select>
@@ -79,7 +75,7 @@ const Login = () => {
                         type="email"
                         name="email"
                         placeholder="enter your email"
-                        value={formData.email}
+                        value={email}
                         onChange={handleChange}
                         required
                         style={styles.input}
@@ -88,15 +84,24 @@ const Login = () => {
 
                 <div style={styles.inputGroup}>
                     <label>Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="••••••••"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        style={styles.input}
-                    />
+                    <div style={styles.passwordWrapper}>
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder=""
+                            value={password}
+                            onChange={handleChange}
+                            required
+                            style={styles.input}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            style={styles.toggleBtn}
+                        >
+                            {showPassword ? "Hide" : "Show"}
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" disabled={loading} style={styles.button}>
@@ -117,7 +122,9 @@ const styles = {
     form: { width: "100%", maxWidth: "400px", padding: "40px", backgroundColor: "#fff", borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" },
     title: { textAlign: "center", marginBottom: "30px", fontSize: "24px", fontWeight: "600", color: "#333" },
     inputGroup: { marginBottom: "20px", display: "flex", flexDirection: "column" },
-    input: { padding: "12px", borderRadius: "8px", border: "1px solid #ddd", marginTop: "8px", fontSize: "16px" },
+    input: { padding: "12px", borderRadius: "8px", border: "1px solid #ddd", marginTop: "8px", fontSize: "16px", outline: "none", width: "100%", boxSizing: "border-box" },
+    passwordWrapper: { position: "relative", display: "flex", alignItems: "center" },
+    toggleBtn: { position: "absolute", right: "12px", top: "50%", transform: "translateY(-20%)", background: "none", border: "none", color: "#007bff", cursor: "pointer", fontSize: "14px", fontWeight: "600" },
     button: { width: "100%", padding: "12px", backgroundColor: "#007bff", color: "#fff", border: "none", borderRadius: "8px", fontSize: "16px", cursor: "pointer", marginTop: "10px" },
     error: { padding: "12px", backgroundColor: "#ffebee", color: "#c62828", borderRadius: "8px", marginBottom: "20px", textAlign: "center" },
     footer: { textAlign: "center", marginTop: "20px", fontSize: "14px", color: "#666" }

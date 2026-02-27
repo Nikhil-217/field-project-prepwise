@@ -74,6 +74,7 @@ const TeacherUpload = () => {
                             <option value="">Select subject</option>
                             <option value="OOPS">OOPS</option>
                             <option value="SMDA">SMDA</option>
+                            <option value="Software Engineering">Software Engineering</option>
                             <option value="DLD">DLD</option>
                             <option value="DBMS">DBMS</option>
                             <option value="MFCS">MFCS</option>

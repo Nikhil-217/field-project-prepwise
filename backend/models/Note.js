@@ -13,6 +13,15 @@
 
 const mongoose = require("mongoose");
 
+// Allowed subjects for R22 regulation (STRICT - ONLY THESE SUBJECTS)
+const ALLOWED_SUBJECTS = [
+    "Software Engineering",
+    "Operating System",
+    "Design and Analysis of Algorithm",
+    "Computer Organisation",
+    "Economics and Engineering Accountancy"
+];
+
 const noteSchema = new mongoose.Schema(
     {
         // ── CONTENT FIELDS ────────────────────────────────────────────────────
@@ -24,46 +33,59 @@ const noteSchema = new mongoose.Schema(
         },
 
         subject: {
-            // e.g., "Data Structures and Algorithms", "Operating Systems"
+            // e.g., "Software Engineering", "Operating System"
             type: String,
             required: [true, "Subject is required"],
             trim: true,
+            validate: {
+                validator: function (v) {
+                    // Enforce subject validation for R22 regulation
+                    if (this.regulation === "R22") {
+                        return ALLOWED_SUBJECTS.includes(v);
+                    }
+                    return true;
+                },
+                message: `Subject must be one of: ${ALLOWED_SUBJECTS.join(", ")}`,
+            },
         },
 
         // ── ACADEMIC CLASSIFICATION FIELDS ────────────────────────────────────
         // These four fields together uniquely identify WHERE in the curriculum a
         // note belongs. Students filter by exactly these fields on the frontend.
+        // LOCKED: R22, Year 2, Semester 1 for this implementation
 
         regulation: {
             // The university regulation batch — R22 means admitted in 2022.
-            // Stored as a string so future regulations (R26, R28) are just new values.
+            // LOCKED to R22 for this implementation
             type: String,
             required: [true, "Regulation is required"],
             enum: {
-                values: ["R19", "R20", "R22"],
-                message: "Regulation must be R19, R20, or R22",
+                values: ["R22"],
+                message: "Regulation must be R22",
             },
             default: "R22",
         },
 
         year: {
             // Academic year: 1 (freshman) → 4 (final year)
+            // LOCKED to Year 2 for this implementation
             type: Number,
             required: [true, "Year is required"],
             enum: {
-                values: [1, 2, 3, 4],
-                message: "Year must be 1, 2, 3, or 4",
+                values: [2],
+                message: "Year must be 2",
             },
             default: 2,
         },
 
         semester: {
             // Semester within the year: 1 (odd) or 2 (even)
+            // LOCKED to Semester 1 for this implementation
             type: Number,
             required: [true, "Semester is required"],
             enum: {
-                values: [1, 2],
-                message: "Semester must be 1 or 2",
+                values: [1],
+                message: "Semester must be 1",
             },
             default: 1,
         },
